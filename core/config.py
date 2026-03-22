@@ -1,6 +1,4 @@
 """
-core/config.py — Shared constants for the face enhancement pipeline.
-
 MediaPipe Face Mesh uses 468 3-D landmarks on a normalised [0,1] grid.
 The indices below were selected to form tight convex hulls around each
 facial region so we can build a smooth blending mask in Stage 4.

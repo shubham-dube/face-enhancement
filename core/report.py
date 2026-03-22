@@ -1,6 +1,4 @@
 """
-core/report.py — Self-contained A/B HTML report generator.
-
 Produces a single enhancement_report.html with:
   • No external CDN dependencies (all CSS + JS inline, images as base64)
   • Dark surveillance-system aesthetic

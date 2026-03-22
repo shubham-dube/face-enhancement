@@ -1,6 +1,4 @@
 """
-core/stages.py — Four-stage CCTV face enhancement pipeline.
-
 Stage 1: Adaptive NLM denoising   (noise-level-aware h parameter)
 Stage 2: Perceptual CLAHE          (LAB colour space, L-channel only)
 Stage 3: Multi-step LANCZOS upscale with intermediate unsharp masking

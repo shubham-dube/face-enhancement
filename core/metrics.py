@@ -1,6 +1,4 @@
 """
-core/metrics.py — Evaluation helpers for the face enhancement pipeline.
-
 Functions
 ---------
 sharpness        Laplacian variance (higher = sharper image)

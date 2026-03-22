@@ -1,6 +1,4 @@
 """
-solution.py
-Sentio Mind · Project 4 · Low-Resolution CCTV Face Enhancement
 
 Complete implementation — run:
     python solution.py
@@ -22,15 +20,6 @@ Pipeline (4 stages, in order):
   Stage 2 — Perceptual CLAHE              (LAB colour space, L only)
   Stage 3 — Multi-step LANCZOS4 upscale   (2× + unsharp + 2× for tiny faces)
   Stage 4 — Zone sharpening with alignment (MediaPipe Face Mesh)
-
-Innovations beyond the brief
------------------------------
-  · Adaptive NLM h from MAD noise estimator (Donoho & Johnstone, 1994)
-  · Auto eye-axis face alignment inside Stage 4 → better recognition
-  · Laplacian pyramid blending in zone mask → zero visible boundary artefact
-  · MediaPipe singleton (saves ~6 s on 100 faces)
-  · Sharpness gate: already-sharp faces skip stages 1-4 (Bonus requirement)
-  · Composite PQ score + identity clustering in HTML report
 """
 
 import cv2
