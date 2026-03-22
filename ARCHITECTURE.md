@@ -133,53 +133,6 @@ Three strategies applied in sequence before giving up on a match:
 
 ---
 
-## Why Large Images Were Getting Blurred
-
-The sharpness gate bypasses the enhancement stages for images with Laplacian variance > 80. But LANCZOS4 downscaling from 350×450 to 240×240 averages adjacent pixels, which roughly halves the Laplacian variance. A 350px face at sharpness 260 would leave the pipeline at sharpness 65.
-
-The fix is a recovery sharpening pass after downscaling. The strength scales with how much sharpness was lost:
-
-```python
-hot_strength = np.interp(current_lv, [60.0, 200.0], [0.8, 0.3])
-```
-
-A post-downscale image at sharpness 90 gets a moderate push. An image that was already at 200 barely gets touched.
-
----
-
-## Why Medium Images Were Getting Blurred
-
-This was the harder bug. Images with sharpness 40–80 and size ~150px are typical of decent CCTV crops. They fell below the gate, so the old code ran the full pipeline including NLM denoising.
-
-NLM on these images did what it's designed to do — smooth noise. But these images didn't have significant noise. They had useful texture that looked like noise to the estimator. The denoising cost ~80ms and slightly reduced sharpness. Then Stage 4 ran with moderate fixed strengths, not strong enough to overcome the blur introduced in Stage 1.
-
-The fix: a dedicated path for these images that skips Stage 1 entirely and uses adaptive sharpening strengths in Stage 4. Result: sharpness increases rather than decreasing.
-
----
-
-## Video Face Extraction
-
-`extract_faces.py` handles the upstream step of pulling face crops from video.
-
-**IoU tracking** — the same person appears in many consecutive frames. Without tracking, 100 frames of someone walking past a camera produces 100 near-identical crops. IoU matching collapses these into one track and keeps the sharpest frame from that track.
-
-**Scene-cut detection** — mean absolute frame difference above a threshold forces a sample regardless of the configured fps. A face appearing only in the first few frames of a shot would otherwise be missed at low sampling rates.
-
-**Perceptual hash deduplication** — after tracking, `imagehash.phash` catches duplicate faces that appeared in non-overlapping video segments (separate tracks with the same person). This keeps the raw_faces directory clean.
-
-**MTCNN over Haar cascade** — MTCNN is a multi-task CNN that detects faces and facial landmarks simultaneously. It has significantly better recall on small and angled faces than OpenCV's Haar cascade. The script falls back to Haar if MTCNN isn't installed.
-
-**Quality scoring per crop:**
-```
-score = 0.40 × normalized_sharpness
-      + 0.35 × (face_area / frame_area)
-      + 0.25 × detector_confidence
-```
-
-The best-scoring crop from each track is saved.
-
----
-
 ## File Layout
 
 ```
